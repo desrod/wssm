@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
 
-## Set up a virtualenv with the following commands: 
-# python3 -m venv env
-
-## Activate the venv: 
-# . env/bin/activate
-
-## Install some required deps into that venv
-# pip install PyQt5 psutil to make this work
-
-## Run the app
-# ./aproamer.py
 import subprocess
 import sys
 from math import log10
@@ -27,6 +16,9 @@ class wifi_signal_monitor(QWidget):
 
     def initialize_gui(self):
         self.layout = QVBoxLayout()
+
+        self.bssid_label = QLabel("BSSID: N/A")
+        self.layout.addWidget(self.bssid_label)
 
         self.signal_strength_label = QLabel("Signal Strength: N/A")
         self.layout.addWidget(self.signal_strength_label)
@@ -58,7 +50,7 @@ class wifi_signal_monitor(QWidget):
         self.timer.start(500)
 
     def update_signal_strength(self):
-        signal_strength = self.get_signal_strength()
+        signal_strength, bssid = self.get_signal_strength_and_bssid()
         if signal_strength is not None:
             self.signal_strength_label.setText(f"Signal Strength: {signal_strength} dBm")
             self.signal_strength_bar.setValue(
@@ -74,17 +66,26 @@ class wifi_signal_monitor(QWidget):
             self.signal_strength_label.setText("Signal Strength: N/A")
             self.signal_strength_bar.setValue(0)
 
-    def get_signal_strength(self):
+        if bssid is not None:
+            self.bssid_label.setText(f"BSSID: {bssid}")
+        else:
+            self.bssid_label.setText("BSSID: N/A")
+
+    def get_signal_strength_and_bssid(self):
         try:
             result = subprocess.run(["iwconfig"], capture_output=True, text=True)
+            signal_strength = None
+            bssid = None
             for line in result.stdout.split("\n"):
                 if "Signal level=" in line:
                     signal_level = line.split("Signal level=")[1].split(" ")[0]
-                    return int(signal_level)
-            return None
+                    signal_strength = int(signal_level)
+                if "Access Point:" in line:
+                    bssid = line.split("Access Point:")[1].strip()
+            return signal_strength, bssid
         except Exception as e:
-            print(f"Error getting signal strength: {e}")
-            return None
+            print(f"Error getting signal strength and BSSID: {e}")
+            return None, None
 
     def calculate_distance(self, signal_strength):
         # Frequency in MHz (e.g., 2.4 GHz Wi-Fi)
