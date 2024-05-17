@@ -10,13 +10,26 @@ While moving from conference room to confernece room in a large hotel setting, r
 ## Installing
 To install this, simply follow these steps: 
 
+### Install the Python3 Virtual Environment support
 ```
 sudo apt install python3-venv
+```
+
+### Copy the code to your local machine
+```
 cd /tmp/
-git clone github.com/desrod/wssm
+git clone https://github.com/desrod/wssm
 cd wssm
+```
+
+### Initialize your Python virtual environment
+```
 python3 -m venv env
 . env/bin/activate
+```
+
+### Install the required Python dependencies
+```
 pip install -r requirements.txt
 ./wssm.py
 ```
