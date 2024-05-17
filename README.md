@@ -1,4 +1,4 @@
-# Wireless Signal Strengty Meter (wssm)
+# Wireless Signal Strength Meter (wssm)
 
 This is a quick and dirty app I wrote while teaching myself PyQt. 
 
